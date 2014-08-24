@@ -87,6 +87,7 @@ public class GameActivity extends Activity implements SensorEventListener {
 	static AdView adView;
 	static Boolean adVisible = false, adInitialized = false, adTestMode = false;
 	static InterstitialAd interstitial;
+	static String testDeviceID;	
 	////////////////////////////////////////////////////////////////////////
 	
 	private static MainView mMainView;
@@ -138,6 +139,7 @@ public class GameActivity extends Activity implements SensorEventListener {
 		rootLayout.addView(adLayout, adMobLayoutParams);
 		
         setContentView(rootLayout); 
+		testDeviceID = "";
 		////////////////////////////////////////////////////////////////////////
 		
 		Extension.mainView = mView;
@@ -171,15 +173,26 @@ public class GameActivity extends Activity implements SensorEventListener {
 	
 	////////////////////////////////////////////////////////////////////////
 	static public void loadAd() {
-		AdRequest adRequest = new AdRequest.Builder().build();
+		AdRequest adRequest;
+		if (testDeviceID.length() > 0)		
+			adRequest= new AdRequest.Builder().addTestDevice(testDeviceID).build();
+		else
+			adRequest= new AdRequest.Builder().build();
 		adView.loadAd(adRequest);
 	}
 	
-	static public void initAd(final String id, final int x, final int y, final boolean testMode) {
+	static public void initAd(final String id, final int x, final int y, final String testDevice) {
 		activity.runOnUiThread(new Runnable() {
 			public void run() {
 				String adID = id;
-				adTestMode = testMode;
+				
+				if(testDevice.length() > 0)
+				{
+					adTestMode = true;
+					testDeviceID = testDevice;
+				}
+				else
+					adTestMode = false;
 				
 				if (activity == null) {
 					return;
@@ -244,17 +257,29 @@ public class GameActivity extends Activity implements SensorEventListener {
 	}
 	
 	static public void loadInterstitial() {
-		AdRequest adRequest = new AdRequest.Builder().build();
+		AdRequest adRequest;
+		if (testDeviceID.length() > 0)		
+			adRequest= new AdRequest.Builder().addTestDevice(testDeviceID).build();
+		else
+			adRequest= new AdRequest.Builder().build();
 		interstitial.loadAd(adRequest);
 	}
 	
-	static public void initInterstitial(final String id, final boolean testMode) {
+	static public void initInterstitial(final String id, final String testDevice) {
         activity.runOnUiThread(new Runnable() {
             public void run() {
 				if (activity == null) {
 					return;
 				}
 				
+				if(testDevice.length() > 0)
+				{
+					adTestMode = true;
+					testDeviceID = testDevice;
+				}
+				else
+					adTestMode = false;
+					
                 interstitial = new InterstitialAd(activity);
                 interstitial.setAdUnitId(id);
 

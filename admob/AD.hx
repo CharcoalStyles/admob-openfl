@@ -16,10 +16,10 @@ class AD {
 	private static var originX : Int = 0;
 	private static var originY : Int = 0;
 	private static var bannerSize : Int = 0;
-	private static var testMode : Bool = false;
+	
+	private static var testDeviceID : String = "";
 
 	private static var admobInterstitialID:String;
-	private static var testModeInterstitial:Bool;
 
 #if android
 	private static var _initAd_func : Dynamic;
@@ -29,24 +29,25 @@ class AD {
 	private static var _showInterstitial_func : Dynamic;
 
 	
-	public static function init(id : String, x : Int = 0, y : Int = 0, size : Int = 0, test : Bool = false) {
+	public static function init(id : String, x : Int = 0, y : Int = 0, size : Int = 0, ?deviceID:String = "") {
 		admobID = id;
 		originX = x;
 		originY = y;
 		bannerSize = size;
-		testMode = test;
+		testDeviceID = deviceID;
 		
 		// call API
 		if (_initAd_func == null) {
 			_initAd_func = openfl.utils.JNI.createStaticMethod("org.haxe.lime.GameActivity", "initAd",
-				"(Ljava/lang/String;IIZ)V", true);
+				"(Ljava/lang/String;IILjava/lang/String;)V", true);
 		}
 
 		var args = new Array<Dynamic>();
 		args.push(admobID);
 		args.push(originX);
 		args.push(originY);
-		args.push(testMode);
+		args.push(testDeviceID);
+		
 		_initAd_func(args);
 	}
 
@@ -69,20 +70,20 @@ class AD {
 	public static function refresh() : Void {
 	}
 
-	public static function initInterstitial(id : String, test : Bool = false) {
+	public static function initInterstitial(id : String, ?deviceID:String = "") {
 		admobInterstitialID = id;
-		testModeInterstitial = test;
+		testDeviceID = deviceID;
 
 		// call API
 		if (_initInterstitial_func == null) {
 			_initInterstitial_func = openfl.utils.JNI.createStaticMethod(
-				"org.haxe.lime.GameActivity", "initInterstitial", "(Ljava/lang/String;Z)V", true
+				"org.haxe.lime.GameActivity", "initInterstitial", "(Ljava/lang/String;Ljava/lang/String;)V", true
 			);
 		}
 
 		var args = new Array<Dynamic>();
 		args.push(admobInterstitialID);
-		args.push(testModeInterstitial);
+		args.push(testDeviceID);
 		_initInterstitial_func(args);
 	}
 
@@ -97,14 +98,13 @@ class AD {
 	}
 	
 #elseif ios
-	public static function init(id : String, x : Int = 0, y : Int = 0, size : Int = 0, test : Bool = false) {
+	public static function init(id : String, x : Int = 0, y : Int = 0, size : Int = 0) {
 		admobID = id;
 		originX = x;
 		originY = y;
 		bannerSize = size;
-		testMode = test;
 		
-		admob_ad_init(admobID, originX, originY, bannerSize, testMode);
+		admob_ad_init(admobID, originX, originY, bannerSize);
 	}
 	
 	public static function show() : Void {
@@ -119,11 +119,10 @@ class AD {
 		admob_ad_refresh();
 	}
 
-	public static function initInterstitial(id : String, test : Bool = false) {
+	public static function initInterstitial(id : String) {
 		admobInterstitialID = id;
-		testModeInterstitial = test;
-
-		admob_ad_init_interstitial(admobInterstitialID, testModeInterstitial);
+		
+		admob_ad_init_interstitial(admobInterstitialID);
 	}
 
 	public static function showInterstitial() : Void {
@@ -138,7 +137,7 @@ class AD {
 	private static var admob_ad_show_interstitial = flash.Lib.load("admob", "admob_ad_show_interstitial", 0);
 
 #else
-	public static function init(id : String, x : Int = 0, y : Int = 0, size : Int = 0, test : Bool = false) {
+	public static function init(id : String, x : Int = 0, y : Int = 0, size : Int = 0){
 	}
 	public static function show() : Void {
 	}
@@ -146,7 +145,7 @@ class AD {
 	}
 	public static function refresh() : Void {
 	}
-	public static function initInterstitial(id : String, test : Bool = false) {
+	public static function initInterstitial(id : String) {
 	}
 	public static function showInterstitial() : Void {
 	}
