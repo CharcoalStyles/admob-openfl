@@ -46,9 +46,11 @@ import android.widget.RelativeLayout;
 import android.widget.RelativeLayout.LayoutParams;
 import android.graphics.Color;
 import com.google.android.gms.ads.*;
+import com.google.android.gms.common.api.*;
+import com.google.example.games.basegameutils.BaseGameActivity;
 ////////////////////////////////////////////////////////////////////////
 
-public class GameActivity extends Activity implements SensorEventListener {
+public class GameActivity extends BaseGameActivity implements SensorEventListener {
 	
 	
 	private static final int DEVICE_ORIENTATION_UNKNOWN = 0;
@@ -94,9 +96,11 @@ public class GameActivity extends Activity implements SensorEventListener {
 	private MainView mView;
 	private Sound _sound;
 	
-	
+	@Override
 	protected void onCreate (Bundle state) {
+		Log.d("GameActivityLOG", "Substituted GA");
 		
+		requestWindowFeature(Window.FEATURE_NO_TITLE);
 		super.onCreate (state);
 		
 		activity = this;
@@ -112,13 +116,12 @@ public class GameActivity extends Activity implements SensorEventListener {
 		_sound = new Sound (getApplication ());
 		//getResources().getAssets();
 		
-		requestWindowFeature (Window.FEATURE_NO_TITLE);
-		
 		::if WIN_FULLSCREEN::
-			getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
-				| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			::if (ANDROID_TARGET_SDK_VERSION < 19)::
+				getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN
+					| WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+			::end::
 		::end::
-		
 		
 		metrics = new DisplayMetrics ();
 		getWindowManager ().getDefaultDisplay ().getMetrics (metrics);
@@ -930,5 +933,10 @@ public class GameActivity extends Activity implements SensorEventListener {
 		
 	}
 	
+	////////////////////////////////////////////////////
+	@Override public void onSignInSucceeded(){
+	}
+	@Override public void onSignInFailed(){
+	}
 	
 }
